@@ -1,0 +1,125 @@
+#!/bin/bash
+
+if [ $3 ] ### If too many arguments...
+	then
+	echo "./stats {rows|cols}[file]" 1>&2
+	exit 1
+
+### Paremeter expansion "${1:0:2}":
+### param=1, offset=0, length=2
+elif test "${1:0:2}" == "-r" ### If 1st parameter starts with -r...
+ then
+	echo "Average Median"
+### While-loop reads one row per iteration, print its avg and median:
+	while read num 
+		do
+	### "Here string" operator  <<< redirects input
+	###(whole row as unit), but "read -a arrayName" assigns 
+	###each element into sequential indexes in the array. 
+		read -a rowOfNumbers <<< "$num"
+	### Get # of columns to divide by later: 
+		numCols=${#rowOfNumbers[@]}
+	### Get rowOfNumbers sorted with -V for version-sort because 
+	###it accounts for  different # of  digits per word: 
+rowOfNumbers=($(for i in "${rowOfNumbers[@]}"; do echo $i; done |sort -V))
+		i=0
+		sum=0
+	### length = number of elements in rowOfNumbers:
+		length=${#rowOfNumbers[@]}
+	### This loop gets the sum the elements in rowOfNumbers:
+		until [  $i  -eq  $length  ]; do
+			sum=$(($sum + ${rowOfNumbers[i]}))
+			let i+=1
+		done  
+	### Next 8 lines computer the rounded average:
+		sum=$(($sum * 10))
+		sum=$(($sum / $numCols))
+		remainder=$(($sum % 10))
+		if ((remainder > 4 ))
+			then sum=$(($sum / 10 + 1 ))
+		else
+			sum=$(($sum / 10 ))
+		fi 
+	### Median index is 1/2 length of row:
+		i=$(($length / 2))
+		median=${rowOfNumbers[i]}
+	### Print sum and median: 
+		echo "$sum "     " $median"
+	done < $2
+### Column option 
+elif test "${1:0:2}" == "-c" ### "${variable:offset:number of letters}"
+	then
+	numRows=0
+### Loop to get number of columns and rows.
+### Later an until loop will run $numCols number of times 
+###for each column. 
+	while read num
+		do
+	### The read -a command will assign a row of numbers into 
+	###sequential indexes in rowofNumbers. 
+		read -a rowOfNumbers <<< "$num"		
+	### numCols is assigned the number of elements in rowOfNumbers.
+		numCols=${#rowOfNumbers[@]}
+		let numRows+=1
+	done < $2
+### If loop to ensure that list is not empty to avoid division by 0
+	if ((numRows < 1))
+		then exit
+	fi
+	### Declare empty arrays for medians and averages.
+		medianArray=()
+		averageArray=()
+### Until loop puts average and median into arrays
+### (1 column per iteration).
+	idx=1
+	until [  $idx  -gt  $numCols  ]; do
+	### Use command-substitution to paste the output of 
+	###(cat file|cut -f $idx) into colNums:
+		colNums=$(cat "$2"|cut -f $idx) 
+	### The numbers are sorted with sort -n. -n can be 
+	###used because each number in colNums is on a new line. 
+	### The output of "printf  %s\n" is echoed and redassigned to
+	###sorted. The "%sn\n" is to get each  string of chars
+	###that starts on a new line (each number in the  column).
+		sorted=$(echo $(printf "%s\n" $colNums | sort -n))
+	### colNums filled with sorted array:
+		read -a colNums <<< "$sorted"
+		medianIndex=$(( $numRows / 2 ))
+		median=${colNums[medianIndex]}
+	### Column median appended onto end of medianArray:
+		medianArray+=($median)
+		subIndex=0
+		sum=0
+	### Sum the array of integers in colNums:
+		while ((  $subIndex  <  $numRows )); do 
+			sum=$(($sum + ${colNums[subIndex]}))	
+			let subIndex=$subIndex+1
+		done
+	### Get the average:
+		sum=$((sum * 10))
+		sum=$(($sum / $numRows)) ### $sum = 10 * floating-point avg
+		remainder=$((sum % 10))
+		if ((remainder > 4)) ### round up
+			then sum=$(($sum / 10 + 1))
+		else 
+			sum=$(($sum / 10)) ### round down
+		fi
+		averageArray+=($sum) ### filling array with averages
+		let idx+=1
+		
+	done
+### Print whole averageArray and medianArray
+	echo "Averages:"
+### For loop prints whole array and
+### tr is  piped with echo to change instances of newline to '	'
+	for i in ${averageArray[*]}; do echo $i|tr '\n' '	';done
+	echo -e "\n"
+	echo "Medians:"
+	for i in ${medianArray[*]}; do echo $i|tr '\n' '	' ; done
+	echo -e "\n"
+else 
+### Usage messege is sent to both std. output and std. error:
+	echo "./stats {rows |-cols}[file]" 1>&2
+	exit 1
+fi
+

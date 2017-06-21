@@ -1,0 +1,89 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf600
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red34\green45\blue53;\red255\green255\blue255;\red180\green49\blue4;
+}
+{\*\expandedcolortbl;\csgray\c100000;\cssrgb\c17647\c23137\c27059;\cssrgb\c100000\c100000\c100000;\cssrgb\c76471\c27059\c0;
+}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl580\sa240\partightenfactor0
+
+\f0\fs48 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Program 2 \'96 CS 344 \'96 Spring 2015
+\fs28 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+\cf2 \'a0\
+This assignment asks you to write a simple game akin to old text adventure games like Adventure:\
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "http://en.wikipedia.org/wiki/Colossal_Cave_Adventure"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 http://en.wikipedia.org/wiki/Colossal_Cave_Adventure\
+\pard\pardeftab720\sl320\partightenfactor0
+\cf4 \ulc4 \'a0(Links to an external site.)\cb1 \ulnone \
+}}\pard\pardeftab720\sl320\sa240\partightenfactor0
+\cf2 This program will introduce you to programming in C on UNIX based systems, and will get you familiar with reading and writing files.\
+\pard\pardeftab720\sl640\sa120\partightenfactor0
+
+\fs43\fsmilli21600 \cf2 Overview\
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 Your program will first create a series of files that hold descriptions of the rooms and how rooms are connected, and then it will offer to the player an interface for playing the game using those generated rooms.\
+The player will begin in the \'93starting room\'94 and will win the game automatically upon entering the \'93ending room\'94.\
+Finally, the program will exit and display the path taken by the player.\
+\pard\pardeftab720\sl640\sa120\partightenfactor0
+
+\fs43\fsmilli21600 \cf2 Specifications\'a0\
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 The first thing your program must do is generate 7 different rooms in a directory called 
+\i <username>
+\i0 .rooms.
+\i <process id>
+\i0 . For example, the directory, if I was writing the program, should be hard-coded (except for the process id number), as:\
+brewsteb.rooms.19903\
+Each room has a Room Name, at least 3 connections (and at most 6 connections, where the number of connections is random) from this room to other rooms, and a room type. The connections from one room to the others should be randomly assigned \'96 i.e. which rooms connect to each other one is random - but note that if room A connects to room B, then room B must have a connection back to room A. There must be at least one connected path from the start room to the end room (described below).\
+The file that stores each room must have exactly this form, where the \'85 is additional room connections, as randomly generated:\
+ROOM NAME:
+\i  <room name>
+\i0 \cb1 \uc0\u8232 \cb3 CONNECTION 1: 
+\i <room name>
+\i0 \cb1 \uc0\u8232 \cb3 \'85\cb1 \uc0\u8232 \cb3 ROOM TYPE: 
+\i <room type>
+\i0 \
+Choose a list of ten different room names, hard coded into your program, and have your program randomly assign a room name to each room generated. For a given run of your program, a room name cannot be used to generate more than one room.\
+The possible room type entries are: START_ROOM, END_ROOM, and MID_ROOM.\'a0The assignment of which room gets which type should be random. Naturally, only one room should be assigned as the start room, and only one room should be assigned as the end room.\'a0\
+Here are the contents of files representing three sample rooms from a full set of room files. My list of room names includes the following, among others: XYZZY, PLUGH, PLOVER, twisty, Zork, Crowther, and Dungeon.\
+ROOM NAME: XYZZY\cb1 \uc0\u8232 \cb3 CONNECTION 1: PLOVER\cb1 \uc0\u8232 \cb3 CONNECTION 2: Dungeon\cb1 \uc0\u8232 \cb3 CONNECTION 3: twisty\cb1 \uc0\u8232 \cb3 ROOM TYPE: START_ROOM\
+ROOM NAME: twisty\cb1 \uc0\u8232 \cb3 CONNECTION 1: PLOVER\cb1 \uc0\u8232 \cb3 CONNECTION 2: XYZZY\cb1 \uc0\u8232 \cb3 CONNECTION 3: Dungeon\cb1 \uc0\u8232 \cb3 CONNECTION 4: PLUGH\cb1 \uc0\u8232 \cb3 ROOM TYPE: MID_ROOM\
+... (Other rooms) ...\cb1 \uc0\u8232 \u8232 \cb3 ROOM NAME: Dungeon\cb1 \uc0\u8232 \cb3 CONNECTION 1: twisty\cb1 \uc0\u8232 \cb3 CONNECTION 2: PLOVER\cb1 \uc0\u8232 \cb3 CONNECTION 3: XYZZY\cb1 \uc0\u8232 \cb3 CONNECTION 4: PLUGH\cb1 \uc0\u8232 \cb3 CONNECTION 5:\'a0Crowther\cb1 \uc0\u8232 \cb3 CONNECTION 6: Zork\cb1 \uc0\u8232 \cb3 ROOM TYPE: END_ROOM\
+The ordering of the connections from a room to the other rooms, in the file, does not matter.\
+Now let\'92s describe what should be presented to the player. Upon being executed, after the rooms are generated, the game should present an interface to the player. Note that the room data must be read back into the program from the files, for use by the game. You can either do all of this reading immediately after writing them, or read each file in as needed in the course of the game.\
+This interface should list where the player current is, and list the possible connections that can be followed. It should also then have a prompt. Here is the form that must be used:\
+CURRENT LOCATION: XYZZY\cb1 \uc0\u8232 \cb3 POSSIBLE CONNECTIONS: PLOVER, Dungeon, twisty.\cb1 \uc0\u8232 \cb3 WHERE TO? >\
+The cursor should be placed just after the > sign. Note the punctuation used: colons on the first two lines, commas on the second line, and the period on the second line. All are required.\
+When the user types in the exact name of a connection to another room (Dungeon, for example), and then hits return, your program should write a new line, and then continue running as before. For example, if I typed twisty above, here is what the output should look like:\
+CURRENT LOCATION: XYZZY\cb1 \uc0\u8232 \cb3 POSSIBLE CONNECTIONS: PLOVER, Dungeon, twisty.\cb1 \uc0\u8232 \cb3 WHERE TO? >twisty\cb1 \uc0\u8232 \u8232 \cb3 CURRENT LOCATION: twisty\cb1 \uc0\u8232 \cb3 POSSIBLE CONNECTIONS: PLOVER, XYZZY, Dungeon, PLUGH.\cb1 \uc0\u8232 \cb3 WHERE TO? >\
+If the user types anything but a valid room name from this location (case matters!), the program should return an error line that says \'93HUH? I DON\'92T UNDERSTAND THAT ROOM. TRY AGAIN.\'94, and repeat the current location and prompt, as follows:\
+CURRENT LOCATION: XYZZY\cb1 \uc0\u8232 \cb3 POSSIBLE CONNECTIONS: PLOVER, Dungeon, twisty.\cb1 \uc0\u8232 \cb3 WHERE TO? >Twisty\cb1 \uc0\u8232 \u8232 \cb3 HUH? I DON\'92T UNDERSTAND THAT ROOM. TRY AGAIN.\cb1 \uc0\u8232 \u8232 \cb3 CURRENT LOCATION: XYZZY\cb1 \uc0\u8232 \cb3 POSSIBLE CONNECTIONS: PLOVER, Dungeon, twisty.\cb1 \uc0\u8232 \cb3 WHERE TO? >\
+Trying to go to an incorrect location does not increment the path history or the step count. Once the user has reached the End Room, the program should indicate that it has been reached. It should also print out the path the user has taken to get there, the number of steps, and a congratulatory message. Here is a complete game example, showing the winning messages and formatting, and the return to the prompt:\
+CURRENT LOCATION: XYZZY\cb1 \uc0\u8232 \cb3 POSSIBLE CONNECTIONS: PLOVER, Dungeon, twisty.\cb1 \uc0\u8232 \cb3 WHERE TO? >Twisty\cb1 \uc0\u8232 \u8232 \cb3 HUH? I DON\'92T UNDERSTAND THAT ROOM. TRY AGAIN.\cb1 \uc0\u8232 \u8232 \cb3 CURRENT LOCATION: XYZZY\cb1 \uc0\u8232 \cb3 POSSIBLE CONNECTIONS: PLOVER, Dungeon, twisty.\cb1 \uc0\u8232 \cb3 WHERE TO? >twisty\cb1 \uc0\u8232 \u8232 \cb3 CURRENT LOCATION: twisty\cb1 \uc0\u8232 \cb3 POSSIBLE CONNECTIONS: PLOVER, XYZZY, Dungeon, PLUGH.\cb1 \uc0\u8232 \cb3 WHERE TO? >Dungeon\cb1 \uc0\u8232 \u8232 \cb3 YOU HAVE FOUND THE END ROOM. CONGRATULATIONS!\cb1 \uc0\u8232 \cb3 YOU TOOK 2 STEPS. YOUR PATH TO VICTORY WAS:\cb1 \uc0\u8232 \cb3 twisty\cb1 \uc0\u8232 \cb3 Dungeon\cb1 \uc0\u8232 \cb3 %\
+Note the punctuation used: I expect the same punctuation in your program.\
+What you\'92ll submit is your program, named 
+\i <username>
+\i0 .adventure.c. It will be compiled using this line, with my username as the example:\
+%gcc \'96o brewsteb.adventure brewsteb.adventure.c\
+When your program exits, set the error code to 0, and leave the rooms directory in place, so that it can also be examined.\
+If you need to use temporary files, place them in the directory you create, above. Do not leave any behind once your program is finished. We will not test for early termination of your program, so you don\'92t need to watch for those signals.\
+\pard\pardeftab720\sl640\sa120\partightenfactor0
+
+\fs43\fsmilli21600 \cf2 Hints\
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 You\'92ll need to figure out how to get C to read input from the keyboard, and pause until input is received. I recommend you use the fgets() function. You\'92ll also get the chance to become proficient reading and writing files. You may use either the older open, close, lseek method of manipulating files, or the STDIO standard input library methods that use fopen, fclose, and fseek.\
+\pard\pardeftab720\sl640\sa120\partightenfactor0
+
+\fs43\fsmilli21600 \cf2 Grading\'a0\
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 You should be warned that if your program doesn\'92t compile or doesn\'92t generate room files on execution, you\'92ll receive a zero for the grade.\
+80% of your grade will be based on well you adhere to the specifications above.\
+20% of your grade will be based on your style, readability, and commenting.\
+}

@@ -1,0 +1,88 @@
+Program 1 – CS 344 – Spring 2015
+ 
+This assignment asks you to write a Bourne shell script to compute statistics.  The purpose is to get you familiar with the Unixshell, shell programming, Unix utilities, standard input, output, and error, pipelines, process ids, exit values, and signals.
+What you’re going to submit is your script, called stats.
+
+Overview
+
+NOTE: For this assignment, make sure that you are using Bash as your shell (on Linux, /bin/sh is Bash, but on other Unix O/S, itis not). This is because the Solaris version of Bourne shell has some annoying bugs that are really brought out by this script. Bashcan execute any /bin/sh script.
+In this assignment you will write a Bourne shell script to calculate averages and medians from an input file of numbers.  This isthe sort of calculation I might do when figuring out the grades for this course. The input file will have whole number valuesseparated by tabs, and each line of this file will have the same number of values.  (For example, each row might be the scores ofa student on assignments.)  Your script should be able to calculate the average and median across the rows (like I might do tocalculate an individual student's course grade) or down the columns (like I might do to find the average score on an assignment).
+
+You will probably need commands like these, so please read up on them: sh, read, expr, cut, head, tail, wc, and sort.
+
+Your script will be called stats.  The general format of the stats command is
+stats {-rows|-cols} [input_file]
+
+Note that when things are in curly braces separated by a vertical bar, it means you should choose one of the things; here forexample, you must choose either -rows or -cols. The option -rows calculates the average and median across the rows; theoption -cols calculates the average and median down the columns.  When things are in square braces it means they are optional;you can include them or not, as you choose.  If you specify an input_file the data is read from that file; otherwise, it is read fromstandard input.
+Here is a sample run of what your script might return, using an input file called test_file (this particular one can be downloadedhere, note that in Windows, the newline characters may not display as newlines. Move this to your UNIX account, withoutopening and saving it in Windows, and then cat it out: you'll see the newlines there):
+% cat test_file
+ 1       1       1       1       1
+ 9       3       4       5       5
+ 6       7       8       9       7
+ 3       6       8       9       1
+ 3       4       2       1       4
+ 6       4       4       7       7
+% stats -rows test_file
+ Average Median
+ 1       1
+ 5       5
+ 7       7
+ 5       6
+ 3       3
+ 6       6
+% cat test_file | stats –c
+ Averages:
+ 5       4       5       5       4       
+ Medians:
+ 6       4       4       7       5      
+% echo $?
+ 0
+% stats
+ Usage: stats {-rows|-cols} [file]
+% stats -r test_file nya-nya-nya
+ Usage: stats {-rows|-cols} [file]
+% stats -both test_file
+ Usage: stats {-rows|-cols} [file]
+% chmod -r test_file
+% stats -columns test_file
+ stats: cannot read test_file
+% stats -columns no_such_file
+ stats: cannot read no_such_file
+% echo $?
+ 1
+
+Specifications 
+You must check for the right number and format of arguments to stats. You should allow users to abbreviate -rows and -cols;any word beginning with a lowercase r is taken to be rows and any word beginning with a lowercase c is taken to be cols.  So, forexample, you would get averages and medians across the rows with -r, -rowwise and -rumplestiltskin, but not -Rows.  If thecommand has too many or two few arguments or if the arguments of the wrong format you should output an error message tostandard error.  You should also output an error message to standard error if the input file is specified, but it is not readable.
+You should output the statistics to standard output in the format shown above.  Be sure all error messages are sent to standarderror and the statistics are sent to standard output.  If there is any error, the exit value should be 1; if the stats program runssuccessfully the exit value should be 0.
+Your stats program should be able to handle files with any reasonable number of rows or columns.  You can assume that eachrow will be less than 1000 bytes long (because Unix utilities assume that input lines will not be too long), but don't make anyassumptions about the number of rows.  Think about where in your program the size of the input file matters.  You can assumethat all rows will have the same number of values; you do not have to do any error checking on this.
+
+You will probably need to use temporary files.  For this assignment, the temporary files should be put in the current workingdirectory.  (A more standard place for temporary files is in /tmp but don't do that for this assignment; it makes grading easier ifthey are in the current directory.)  Be sure the temporary file uses the process id as part of its name, so that there will not beconflicts if the stats program is running more than once.  Be sure you remove any temporary files when your stats program isdone.  You should also use the trap command to catch interrupt, hangup, and terminate signals to remove the temporary files ifthe stats program is terminated unexpectedly.
+
+All values and results are and must be whole numbers. You may use the expr command to do your calculations, or any otherbash shell scripting method, but you may not do the calculations by dropping into another language, like awk, perl, python, orany other language. You may certainly use these other languages for all other parts of the assignment. Note that expr only workswith whole numbers. When you calculate the average you should round to the nearest whole number, where half values roundup (i.e. 7.5 rounds up to 8). This is the most common form of rounding. You can learn more about rounding methods here (seeHalf Round Up):
+http://www.mathsisfun.com/numbers/rounding-methods.html
+ (Linkstoanexternalsite.)
+To calculate the median, sort the values and take the middle value. For example, the median of 97, 90, and 83 is 90.  The medianof 97, 90, 83, and 54 is still 90 - when there are an even number of values, choose the larger of the two middle values.
+Your script, stats, must be entirely contained in that file. Do not split this assignment into multiple files or programs.
+To make it easy to see how you're doing, you can download the actual grading script here:
+p1gradingscript
+This script is the very one that will be used to assign your script a grade. To compare yours to a perfect solution, you candownload here a completely correct run of my stats script that shows what you should get if everything is working correctly:
+
+p1cleantestscript
+The p1gradingscript itself is a good resource for seeing how some of the more complex shell scripting commands work, too.
+
+Hints
+
+One problem that will be especially challenging is to read in the values from a specified file.  The read command is exactly whatyou need (see the man page for read).  However, read is meant to read from standard input and the input file is not necessarilystandard input to the stats command.  You will have to figure out how to get read to read from a file. The man page for sh hasthe information you need to figure this out.
+Another problem will be calculating the median.  There is a straight forward pipelined command that will do this, using cut, sort,head, and tail.  Maybe you can figure out other ways, too. Experiment!
+The expr command and the shell can have conflicts over special characters.
+
+  If you try  expr 5 * ( 4 + 2 ), the shell will think * is a filename wild card and the parentheses mean command grouping.
+
+You have to use backslashes, like this: expr 5 \* \( 4 + 2 \)
+
+Grading
+
+128 points are available from successfully passing the grading script, while the final 32 points will be based on your style,readability, and commenting. Comment well, often, and verbosely: we want to see that you are telling us WHY you are doingthings, in addition to telling us WHAT you are doing.
+
+
+v

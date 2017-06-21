@@ -1,0 +1,116 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf600
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red179\green255\blue205;\red148\green190\blue255;
+\red34\green45\blue53;\red38\green38\blue38;\red242\green242\blue242;\red180\green49\blue4;}
+{\*\expandedcolortbl;\csgray\c100000;\cssrgb\c0\c0\c0;\cssrgb\c74510\c100000\c83922;\cssrgb\c64314\c79608\c100000;
+\cssrgb\c17647\c23137\c27059;\cssrgb\c20000\c20000\c20000;\cssrgb\c96078\c96078\c96078;\cssrgb\c76471\c27059\c0;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl720\sa120\partightenfactor0
+
+\f0\fs48 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Program \cb4 1\'a0\'96\cb3  CS 344 \'96 Spring 2015
+\fs50\fsmilli25200 \cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 \cb3 \strokec2 \'a0\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 This assignment asks you to write a Bourne shell script to compute statistics.\'a0 The purpose is to get you familiar with the Unixshell, shell programming, Unix utilities, standard input, output, and error, pipelines, process ids, exit values, and signals.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 What you\'92re going to submit is your script, called stats.\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl740\sa120\partightenfactor0
+
+\fs50\fsmilli25200 \cf2 \cb3 \strokec2 Overview\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 \cb3 \strokec2 NOTE: For this assignment, make sure that you are using Bash as your shell (on Linux, /bin/sh is Bash, but on other Unix O/S, itis not). This is because the Solaris version of Bourne shell has some annoying bugs that are really brought out by this script. Bashcan execute any /bin/sh script.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 In this assignment you will write a Bourne shell script to calculate averages and medians from an input file of numbers.\'a0 This isthe sort of calculation I might do when figuring out the grades for this course. The input file will have whole number valuesseparated by tabs, and each line of this file will have the same number of values.\'a0 (For example, each row might be the scores ofa student on assignments.)\'a0 Your script should be able to calculate the average and median across the rows (like I might do tocalculate an individual student's course grade) or down the columns (like I might do to find the average score on an assignment).\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 You will probably need commands like these, so please read up on them: sh, read, expr, cut, head, tail, wc, and sort.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 Your script will be called stats.\'a0 The general format of the stats command is\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl400\partightenfactor0
+
+\f1\fs19\fsmilli9750 \cf2 \cb3 \strokec2 stats \{-rows|-cols\} [input_file]\cf6 \cb7 \strokec6 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\f0\fs28 \cf2 \cb3 \strokec2 Note that when things are in curly braces separated by a vertical bar, it means you should choose one of the things; here forexample, you must choose either -rows or -cols. The option -rows calculates the average and median across the rows; theoption -cols calculates the average and median down the columns.\'a0 When things are in square braces it means they are optional;you can include them or not, as you choose.\'a0 If you specify an input_file the data is read from that file; otherwise, it is read fromstandard input.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 Here is a sample run of what your script might return, using an input file called test_file (this particular one can be downloaded{\field{\*\fldinst{HYPERLINK "https://oregonstate.instructure.com/courses/1516852/files/62276002/download?wrap=1"}}{\fldrslt \ul here\cf8 \cb1 \ulnone \strokec8 }}, note that in Windows, the newline characters may not display as newlines. Move this to your UNIX account, withoutopening and saving it in Windows, and then cat it out: you'll see the newlines there):\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl400\partightenfactor0
+
+\f1\fs19\fsmilli9750 \cf2 \cb3 \strokec2 % cat test_file\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2  1\'a0\'a0\'a0\'a0\'a0\'a0 1\'a0\'a0\'a0\'a0\'a0\'a0 1\'a0\'a0\'a0\'a0\'a0\'a0 1\'a0\'a0\'a0\'a0\'a0\'a0 1\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  9\'a0\'a0\'a0\'a0\'a0\'a0 3\'a0\'a0\'a0\'a0\'a0\'a0 4\'a0\'a0\'a0\'a0\'a0\'a0 5\'a0\'a0\'a0\'a0\'a0\'a0 5\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  6\'a0\'a0\'a0\'a0\'a0\'a0 7\'a0\'a0\'a0\'a0\'a0\'a0 8\'a0\'a0\'a0\'a0\'a0\'a0 9\'a0\'a0\'a0\'a0\'a0\'a0 7\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  3\'a0\'a0\'a0\'a0\'a0\'a0 6\'a0\'a0\'a0\'a0\'a0\'a0 8\'a0\'a0\'a0\'a0\'a0\'a0 9\'a0\'a0\'a0\'a0\'a0\'a0 1\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  3\'a0\'a0\'a0\'a0\'a0\'a0 4\'a0\'a0\'a0\'a0\'a0\'a0 2\'a0\'a0\'a0\'a0\'a0\'a0 1\'a0\'a0\'a0\'a0\'a0\'a0 4\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  6\'a0\'a0\'a0\'a0\'a0\'a0 4\'a0\'a0\'a0\'a0\'a0\'a0 4\'a0\'a0\'a0\'a0\'a0\'a0 7\'a0\'a0\'a0\'a0\'a0\'a0 7\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % stats -rows test_file\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  Average Median\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  1\'a0\'a0\'a0\'a0\'a0\'a0 1\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  5\'a0\'a0\'a0\'a0\'a0\'a0 5\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  7\'a0\'a0\'a0\'a0\'a0\'a0 7\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  5\'a0\'a0\'a0\'a0\'a0\'a0 6\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  3\'a0\'a0\'a0\'a0\'a0\'a0 3\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  6\'a0\'a0\'a0\'a0\'a0\'a0 6\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % cat test_file | stats \'96c\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  Averages:\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  5\'a0\'a0\'a0\'a0\'a0\'a0 4\'a0\'a0\'a0\'a0\'a0\'a0 5\'a0\'a0\'a0\'a0\'a0\'a0 5\'a0\'a0\'a0\'a0\'a0\'a0 4\'a0\'a0\'a0\'a0\'a0\'a0 \cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  Medians:\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  6\'a0\'a0\'a0\'a0\'a0\'a0 4\'a0\'a0\'a0\'a0\'a0\'a0 4\'a0\'a0\'a0\'a0\'a0\'a0 7\'a0\'a0\'a0\'a0\'a0\'a0 5\'a0\'a0\'a0\'a0\'a0\'a0\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % echo $?\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  0\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % stats\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  Usage: stats \{-rows|-cols\} [file]\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % stats -r test_file nya-nya-nya\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  Usage: stats \{-rows|-cols\} [file]\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % stats -both test_file\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  Usage: stats \{-rows|-cols\} [file]\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % chmod -r test_file\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % stats -columns test_file\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  stats: cannot read test_file\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % stats -columns no_such_file\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  stats: cannot read no_such_file\cf6 \cb7 \strokec6 \
+\cf2 \cb3 \strokec2 % echo $?\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2  1\cf6 \cb7 \strokec6 \
+\pard\pardeftab720\sl740\sa120\partightenfactor0
+
+\f0\fs50\fsmilli25200 \cf2 \cb3 \strokec2 Specifications\'a0\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 \cb3 \strokec2 You must check for the right number and format of arguments to stats. You should allow users to abbreviate -rows and -cols;any word beginning with a lowercase r is taken to be rows and any word beginning with a lowercase c is taken to be cols.\'a0 So, forexample, you would get averages and medians across the rows with -r, -rowwise and -rumplestiltskin, but not -Rows.\'a0 If thecommand has too many or two few arguments or if the arguments of the wrong format you should output an error message tostandard error.\'a0 You should also output an error message to standard error if the input file is specified, but it is not readable.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 You should output the statistics to standard output in the format shown above.\'a0 Be sure all error messages are sent to standarderror and the statistics are sent to standard output.\'a0 If there is any error, the exit value should be 1; if the stats program runssuccessfully the exit value should be 0.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 Your stats program should be able to handle files with any reasonable number of rows or columns.\'a0 You can assume that eachrow will be less than 1000 bytes long (because Unix utilities assume that input lines will not be too long), but don't make anyassumptions about the number of rows.\'a0 Think about where in your program the size of the input file matters.\'a0 You can assumethat all rows will have the same number of values; you do not have to do any error checking on this.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 You will probably need to use temporary files.\'a0 For this assignment, the temporary files should be put in the current workingdirectory.\'a0 (A more standard place for temporary files is in /tmp but don't do that for this assignment; it makes grading easier ifthey are in the current directory.)\'a0 Be sure the temporary file uses the process id as part of its name, so that there will not beconflicts if the stats program is running more than once.\'a0 Be sure you remove any temporary files when your stats program isdone.\'a0 You should also use the trap command to catch interrupt, hangup, and terminate signals to remove the temporary files ifthe stats program is terminated unexpectedly.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 All values and results are and must be whole numbers. You may use the expr command to do your calculations, or any otherbash shell scripting method, but you may not do the calculations by dropping into another language, like awk, perl, python, orany other language. You may certainly use these other languages for all other parts of the assignment. Note that expr only workswith whole numbers. When you calculate the average you should round to the nearest whole number, where half values roundup (i.e. 7.5 rounds up to 8). This is the most common form of rounding. You can learn more about rounding methods here (seeHalf Round Up):\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "http://www.mathsisfun.com/numbers/rounding-methods.html"}}{\fldrslt \cf2 \cb3 \ul \ulc2 \strokec2 http://www.mathsisfun.com/numbers/rounding-methods.html\
+\pard\pardeftab720\sl320\partightenfactor0
+\cf2 \ulc2 \'a0(Linkstoanexternalsite.)\cf8 \cb1 \ulnone \strokec8 \
+}}\pard\pardeftab720\sl320\sa240\partightenfactor0
+\cf2 \cb3 \strokec2 To calculate the median, sort the values and take the middle value. For example, the median of 97, 90, and 83 is 90.\'a0 The medianof 97, 90, 83, and 54 is still 90 - when there are an even number of values, choose the larger of the two middle values.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 Your script, stats, must be entirely contained in that file. Do not split this assignment into multiple files or programs.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 To make it easy to see how you're doing, you can download the actual grading script here:\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://oregonstate.instructure.com/courses/1516852/files/62368481/download?wrap=1"}}{\fldrslt \cf2 \cb3 \ul \ulc2 \strokec2 p1gradingscript\cf8 \cb1 \ulnone \strokec8 }}\
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+\cf2 \cb3 \strokec2 This script is the very one that will be used to assign your script a grade. To compare yours to a perfect solution, you candownload here a completely correct run of my stats script that shows what you should get if everything is working correctly:\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://oregonstate.instructure.com/courses/1516852/files/62284403/download?wrap=1"}}{\fldrslt \cf2 \cb3 \ul \ulc2 \strokec2 p1cleantestscript\cf8 \cb1 \ulnone \strokec8 }}\
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+\cf2 \cb3 \strokec2 The p1gradingscript itself is a good resource for seeing how some of the more complex shell scripting commands work, too.\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl740\sa120\partightenfactor0
+
+\fs50\fsmilli25200 \cf2 \cb3 \strokec2 Hints\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 \cb3 \strokec2 One problem that will be especially challenging is to read in the values from a specified file.\'a0 The read command is exactly whatyou need (see the man page for read).\'a0 However, read is meant to read from standard input and the input file is not necessarilystandard input to the stats command.\'a0 You will have to figure out how to get read to read from a file. The man page for sh hasthe information you need to figure this out.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 Another problem will be calculating the median. \'a0There is a straight forward pipelined command that will do this, using cut, sort,head, and tail.\'a0 Maybe you can figure out other ways, too. Experiment!\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 The expr command and the shell can have conflicts over special characters.\'a0 If you try \cf5 \cb1 \strokec5 \uc0\u8232 \cf2 \cb3 \strokec2 expr 5 * ( 4 + 2 ), the shell will think * is a filename wild card and the parentheses mean command grouping.\cf5 \cb1 \strokec5 \
+\cf2 \cb3 \strokec2 You have to use backslashes, like this: expr 5 \\* \\( 4 + 2 \\)\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl740\sa120\partightenfactor0
+
+\fs50\fsmilli25200 \cf2 \cb3 \strokec2 Grading\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\sa240\partightenfactor0
+
+\fs28 \cf2 \cb3 \strokec2 128 points are available from successfully passing the grading script, while the final 32 points will be based on your style,readability, and commenting. Comment well, often, and verbosely: we want to see that you are telling us WHY you are doingthings, in addition to telling us WHAT you are doing.\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sl320\partightenfactor0
+\cf5 \
+\
+v}
